@@ -41,11 +41,13 @@ void verifica(int numFilosofo){
 }
 
 void pegarGarfo(int numFilosofo){
-	//seta estado como fome
-	estadoFilosofo[numFilosofo] = FOME;
-
 	//entra na regiao critica, outros filosos nao podem pegar o garfo ao mesmo tempo
 	sem_wait(&mutex);
+
+	//seta estado como fome
+        estadoFilosofo[numFilosofo] = FOME;
+        printf("\nO filosofo %d esta com fome!", numFilosofo);
+
 
 	//verifica se ele pode comer (se esta com fome e os vizinhos nao estao comendo), se sim, dentro da funcao verifica() muda seu estado para comendo
 	//se nao, ele espera ate que o filosofo que esta comendo sinalize que acabou de comer
@@ -75,7 +77,7 @@ void soltarGarfo(int numFilosofo){
 
 void pensar(int numFilosofo){
 	printf("Eu, Filosofo %d, estou pensando...", numFilosofo);
-	sleep(3);
+	sleep(5);
 }
 
 
@@ -101,7 +103,7 @@ int main(){
 	//criando as threads (filosofos)
 	for(int i=0; i<5; i++){
 		pthread_create(&thread_id[i], NULL, filosofos, &vFilosofos[i]);
-		printf("criei o filosofo %d...", i);
+		printf("criei o filosofo %d...", i+1);
 	}
 
 	//inicializando threads
