@@ -11,7 +11,7 @@
 
 int vFilosofos[5] = {1, 2, 3, 4, 5};
 sem_t semFilosofos[5];
-sem_t mutex; 
+sem_t arbitro; 
 int estadoFilosofo[5];
 
 //funcoes para facilitar recuperar os vizinhos/garfos  de um Filosofo i
@@ -42,7 +42,7 @@ void verifica(int numFilosofo){
 
 void pegarGarfo(int numFilosofo){
 	//entra na regiao critica, outros filosos nao podem pegar o garfo ao mesmo tempo
-	sem_wait(&mutex);
+	sem_wait(&arbitro);
 
 	//seta estado como fome
         estadoFilosofo[numFilosofo] = FOME;
@@ -54,7 +54,7 @@ void pegarGarfo(int numFilosofo){
 	verifica(numFilosofo);
 
 	//sai da regiao critica, agora outros filosofos podem tentar pegar o garfo
-	sem_post(&mutex);
+	sem_post(&arbitro);
 
 	//volta para 0
 	sem_wait(&semFilosofos[numFilosofo]);
@@ -62,7 +62,7 @@ void pegarGarfo(int numFilosofo){
 
 void soltarGarfo(int numFilosofo){
 	//entra na regiao critica, outros filosofos nao podem interagir com o garfo ate este filosofo soltar
-	sem_wait(&mutex);	
+	sem_wait(&arbitro);	
 
 	//quando o filosofo termina de comer, volta para o estado pensando
 	estadoFilosofo[numFilosofo] = PENSANDO;
@@ -72,11 +72,13 @@ void soltarGarfo(int numFilosofo){
 	verifica(direito(numFilosofo));
 
 	//sai da regiao critica
-	sem_post(&mutex);
+	sem_post(&arbitro);
+	printf("Eu, Filosofo %d, estou pensando...", numFilosofo);
 }
 
 void pensar(int numFilosofo){
-	printf("Eu, Filosofo %d, estou pensando...", numFilosofo);
+	estadoFilosofo[numFilosofo] = PENSANDO;
+	//printf("Eu, Filosofo %d, estou pensando...", numFilosofo);
 	sleep(5);
 }
 
@@ -93,7 +95,7 @@ void* filosofos(void* numFilosofo){
 int main(){
 	pthread_t thread_id[5];
 	//inicializando o mutex
-	sem_init(&mutex, 0, 1);
+	sem_init(&arbitro, 0, 2);
 	//inicializando o vetor de semaforos
 	for(int i=0;i<5;i++){
 		sem_init(&semFilosofos[i], 0, 0);
