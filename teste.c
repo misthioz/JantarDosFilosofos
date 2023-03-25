@@ -9,6 +9,7 @@
 #define FOME 1
 #define PENSANDO 0
 
+int vFilosofos[5] = {1, 2, 3, 4, 5};
 sem_t semFilosofos[5];
 sem_t mutex; 
 int estadoFilosofo[5];
@@ -72,20 +73,40 @@ void soltarGarfo(int numFilosofo){
 	sem_post(&mutex);
 }
 
+void pensar(int numFilosofo){
+	printf("Eu, Filosofo %d, estou pensando...", numFilosofo);
+	int tempo = (rand()%10-5);
+	sleep(tempo);
+}
 
-void filosofos(){
-	//while true
-	//num fiilosofo aleatorio?
-	//sleep
-	//fome
-	//sleep
-	//comer
+
+void* filosofos(void* numFilosofo){
+	while(1){
+		int *num = numFilosofo;
+		pensar();
+		pegarGarfo(*num);
+		soltarGarfo(*num);
+	}
 }
 
 int main(){
-	//inicializando o vetor de semaforos (garfos)
+	//inicializando o mutex
+	sem_init(&mutex, 0, 1);
+	//inicializando o vetor de semaforos
 	for(int i=0;i<5;i++){
-		sem_init(&garfos[i], 0, 1);
+		sem_init(&semFilosofos[i], 0, 0);
+		
 	}
+
+	//criando as threads (filosofos)
+	for(int i=0; i<5; i++){
+		pthread_create(&thread_id[i], NULL, filosofos, &vFilosofos[i]);
+	}
+
+	//inicializando threads
+	for(int i =0; i<5; i++){
+		pthread_join(thread_id[i], NULL);
+	}
+
 
 }
