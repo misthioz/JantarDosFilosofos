@@ -94,7 +94,7 @@ void* filosofos(void* numFilosofo){
 
 int main(){
 	pthread_t thread_id[5];
-	//inicializando o mutex
+	//inicializando o arbitro - o arbitro controla o acesso a regiao critica - so 2 filosofos no maximo podem comer
 	sem_init(&arbitro, 0, 2);
 	//inicializando o vetor de semaforos
 	for(int i=0;i<5;i++){
