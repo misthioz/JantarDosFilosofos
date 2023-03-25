@@ -20,15 +20,15 @@ int esquerdo(int i){
 }
 
 int direito(int i){
-	return (i+1)%5
+	return (i+1)%5;
 }
 
 //verifica os estados dos vizinhos e do  Filosofo numFilosofo - se ele estiver com fome e eles nao estiverem comendo ele pode comer
 void verifica(int numFilosofo){
-	if(estadoFilosofos[numFilosofo] == FOME){
-		if(estadoFilosofos[esquerdo(numFilosofo)] != COMENDO && estadoFilosofos[direito(numFilosofo)] != COMENDO){
+	if(estadoFilosofo[numFilosofo] == FOME){
+		if(estadoFilosofo[esquerdo(numFilosofo)] != COMENDO && estadoFilosofo[direito(numFilosofo)] != COMENDO){
 			//setando o estado do filosofo
-			estadoFilosfos[numFilosofo] = COMENDO;
+			estadoFilosofo[numFilosofo] = COMENDO;
 			printf("\nO filosofo %d está comendo.",numFilosofo);
 			//espera
 			sleep(1);
@@ -42,7 +42,7 @@ void verifica(int numFilosofo){
 
 void pegarGarfo(int numFilosofo){
 	//seta estado como fome
-	estadoFilosofos[numFilosofo] = FOME;
+	estadoFilosofo[numFilosofo] = FOME;
 
 	//entra na regiao critica, outros filosos nao podem pegar o garfo ao mesmo tempo
 	sem_wait(&mutex);
@@ -63,7 +63,7 @@ void soltarGarfo(int numFilosofo){
 	sem_wait(&mutex);	
 
 	//quando o filosofo termina de comer, volta para o estado pensando
-	estadoFilosofos[numFilosofo] = PENSANDO;
+	estadoFilosofo[numFilosofo] = PENSANDO;
 
 	//chama a funcao verifica() para os vizinhos e testa se eles podem começar a comer
 	verifica(esquerdo(numFilosofo));
@@ -75,21 +75,21 @@ void soltarGarfo(int numFilosofo){
 
 void pensar(int numFilosofo){
 	printf("Eu, Filosofo %d, estou pensando...", numFilosofo);
-	int tempo = (rand()%10-5);
-	sleep(tempo);
+	sleep(3);
 }
 
 
 void* filosofos(void* numFilosofo){
 	while(1){
 		int *num = numFilosofo;
-		pensar();
+		pensar(*num);
 		pegarGarfo(*num);
 		soltarGarfo(*num);
 	}
 }
 
 int main(){
+	pthread_t thread_id[5];
 	//inicializando o mutex
 	sem_init(&mutex, 0, 1);
 	//inicializando o vetor de semaforos
@@ -101,6 +101,7 @@ int main(){
 	//criando as threads (filosofos)
 	for(int i=0; i<5; i++){
 		pthread_create(&thread_id[i], NULL, filosofos, &vFilosofos[i]);
+		printf("criei o filosofo %d...", i);
 	}
 
 	//inicializando threads
